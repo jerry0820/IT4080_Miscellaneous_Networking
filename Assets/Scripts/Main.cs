@@ -80,7 +80,7 @@ public class Main : NetworkBehaviour {
         }
 
         bool isValidPort = ushort.TryParse(inputPort.text, out ushort port);
-        if(!isValidIp){
+        if(!isValidPort){
             txtStatus.text = "Invaild Port";
             return false;
         }
