@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 
 
@@ -10,10 +11,20 @@ public class LobbyPlayerPanel : MonoBehaviour
     [SerializeField] protected TMPro.TMP_Text txtName;
     [SerializeField] protected TMPro.TMP_Text txtReady;
     [SerializeField] protected GameObject pnlColor;
+    [SerializeField] public Button btnKick;
+
+    public event Action OnKickPlayer;
+
     private bool isReady = false;
 
     public void Start() {
         SetReady(isReady);
+        btnKick.onClick.AddListener(OnKickPlayerClicked);
+    }
+
+    private void OnKickPlayerClicked(){
+        Debug.Log($"Panel for{txtName.text} kick button pressed");
+        OnKickPlayer.Invoke();
     }
 
     public void SetName(string newName) {

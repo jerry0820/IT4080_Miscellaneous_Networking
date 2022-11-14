@@ -9,6 +9,11 @@ public class GameManager : NetworkBehaviour {
 
     private int spawnIndex = 0;
     private List<Vector3> availableSpawnPositions = new List<Vector3>();
+    private List<Player> players = new List<Player>(); 
+
+    private void Start(){
+        GameData.dbgRun.StartGameWithSceneIfNotStarted();
+    }
 
     public void Awake(){
         refreshSpawnPoints();
@@ -41,12 +46,28 @@ public class GameManager : NetworkBehaviour {
         return newPosition;
     }
 
-    private void SpawnPlayers(){
-        foreach(PlayerInfo pi in GameData.Instance.allPlayers){
-            Player playerSpawn = Instantiate(playerPrefab, GetNextSpawnLocation(), Quaternion.identity);
-            playerSpawn.GetComponent<NetworkObject>().SpawnAsPlayerObject(pi.clientId);
-            playerSpawn.PlayerColor.Value = pi.color;
+    private void SpawnPlayers() {
+        foreach (PlayerInfo info in GameData.Instance.allPlayers){
+            SpawnPlayers(info);
         }
+    }
+    private void SpawnPlayers(PlayerInfo info){
+        Player playerSpawn = Instantiate(
+            playerPrefab,
+            GetNextSpawnLocation(),
+            Quaternion.identity);
 
+        playerSpawn.GetComponent<NetworkObject>().SpawnAsPlayerObject(info.clientId);
+        playerSpawn.PlayerColor.Value = info.color;
+        players.Add(playerSpawn);
+        //playerSpawn.Score.OnValueChanged += HostOnPlayerScoreChanged;
+    }
+
+    private void HostOnClientConnected(ulong clientId){
+        int playerIndex = GameData.Instance.FindPlayerIndex(clientId);
+        if(playerIndex != -1){
+            PlayerInfo newPlayerInfo = GameData.Instance.allPlayers[playerIndex];
+            SpawnPlayers(newPlayerInfo);
+        }
     }
 }

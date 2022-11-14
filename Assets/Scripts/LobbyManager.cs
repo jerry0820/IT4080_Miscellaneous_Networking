@@ -15,9 +15,11 @@ public class LobbyManager : NetworkBehaviour
     public Button btnStart;
     public Button btnReady;
     public LobbyPlayerPanel playerPanelPrefab;
+    public ChatUI chat;
 
     
     public void Awake() {
+        GameData.dbgRun.StartGameWithSceneIfNotStarted();
         playerPanels = new List<LobbyPlayerPanel>();
     }
 
@@ -43,6 +45,9 @@ public class LobbyManager : NetworkBehaviour
                 info.isReady = true;
                 GameData.Instance.allPlayers[myIndex] = info;
             }
+        }else {
+            btnStart.gameObject.SetActive(false);
+            NetworkManager.Singleton.OnClientDisconnectCallback += ClientOnDisconnect;
         }
 
         if (IsClient && !IsHost) {
@@ -67,7 +72,17 @@ public class LobbyManager : NetworkBehaviour
         newPanel.SetName($"Player {info.clientId.ToString()}");
         newPanel.SetColor(info.color);
         newPanel.SetReady(info.isReady);
+        //newPanel.ShowKick(IsHost && info.clientId != NetworkManager.Singleton.LocalClientId);
+        newPanel.OnKickPlayer += delegate {
+            OnPlayerKicked(info.clientId);
+        };
         playerPanels.Add(newPanel);
+    }
+
+    private void OnPlayerKicked(ulong clientId){
+        chat.SendSystemMessage($"The host has kicked player{clientId}");
+        NetworkManager.Singleton.DisconnectClient(clientId);
+        GameData.Instance.RemovePlayerFromList(clientId);
     }
 
     private void RefreshPlayerPanels() {
@@ -114,6 +129,9 @@ public class LobbyManager : NetworkBehaviour
 
     private void ClientOnReadyClicked() {
         ToggleReadyServerRpc();
+    }
+    private void ClientOnDisconnect(ulong clientId){
+        SceneManager.LoadScene("Main");
     }
 
 
