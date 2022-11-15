@@ -72,7 +72,7 @@ public class LobbyManager : NetworkBehaviour
         newPanel.SetName($"Player {info.clientId.ToString()}");
         newPanel.SetColor(info.color);
         newPanel.SetReady(info.isReady);
-        //newPanel.ShowKick(IsHost && info.clientId != NetworkManager.Singleton.LocalClientId);
+        newPanel.ShowKick(IsHost && info.clientId != NetworkManager.Singleton.LocalClientId);
         newPanel.OnKickPlayer += delegate {
             OnPlayerKicked(info.clientId);
         };

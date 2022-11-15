@@ -39,6 +39,9 @@ public class LobbyPlayerPanel : MonoBehaviour
         pnlColor.GetComponent<Image>().color = c;
     }
 
+    public void ShowKick(bool jack){
+        btnKick.gameObject.SetActive(jack);
+    }
     public void SetReady(bool ready) {
         isReady = ready;
         if (isReady) {

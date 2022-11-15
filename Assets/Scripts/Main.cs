@@ -111,6 +111,11 @@ public class Main : NetworkBehaviour {
         NetworkManager.Singleton.StartClient();
     }
 
+    public override void OnDestroy(){
+        if(NetworkManager.Singleton != null){
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnDisconnect;    
+        }
+    }
     private void OnDisconnect(ulong clientId) {
         txtStatus.text = "Failed to connect to server";
 
